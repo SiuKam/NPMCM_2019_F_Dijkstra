@@ -37,6 +37,8 @@ current_delta_h = 0;
 current_delta_v = 0;
 
 while U_matrix(end,1)==length(data_set)
+    % U_matrix = sortrows(U_matrix,2);
+
     to_do_list = [];
     for i = S_matrix(:,1).'
         if is_searched(i) == 0

@@ -1,11 +1,11 @@
 clear;
 
 % 参数设置
-alpha_1 = 25;
-alpha_2 = 15;
-beta_1 = 20;
-beta_2 = 25;
-theta = 30;
+alpha_1 = 20;
+alpha_2 = 10;
+beta_1 = 15;
+beta_2 = 20;
+theta = 20;
 delta = 1e-3;
 data_file = 'data_set_2.xlsx';
 
@@ -21,7 +21,7 @@ for i = 1 : length(data_set)
     end
 end
 
-% 初始化各类变�?
+% 初始化各类变�??
 S_matrix = [1,0,0,0];
 U_matrix = [];
 for i = 2:length(data_set)

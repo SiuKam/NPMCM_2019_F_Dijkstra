@@ -32,34 +32,55 @@ function [path_result]=dij(w1)
     % 初始化各类变量
     S_matrix = [1,0,0,0];
     U_matrix = [];
+    to_move = [];
     for i = 2:length(data_set)
         U_matrix = [U_matrix;i,Inf,Inf,Inf];
+        to_move = [to_move;i,0];
     end
 
-    path_matrix = zeros(length(data_set),1);
+    path_vector = zeros(length(data_set),1);
     is_searched = zeros(length(data_set),1);
 
     previous_delta_v = 0;
     previous_delta_h = 0;
     current_delta_h = 0;
     current_delta_v = 0;
+    count = 0
 
     while size(U_matrix) ~= [0 0]
 
         to_do_list = [];
-        for i = S_matrix(:,1).'
-            if is_searched(i) == 0
-                to_do_list = [to_do_list,i];
+
+        count = count + 1;
+
+        if count == 1
+            to_do_list = [1];
+        else
+            for i = U_matrix(:,1).'
+                id_to_U = find(U_matrix(:,1)==i);            
+                if U_matrix(id_to_U,2) < Inf
+                    to_do_list = [to_do_list,i];
+                end
             end
         end
 
         for i = to_do_list
             is_searched(i)=1;
+            if i ~= 1
+                id_to_move = find(to_move(:,1)==i);
+                to_move(id_to_move,2) = 1;   
+            end
             for j = U_matrix(:,1).'
                 new_delta=distance_matrix(j,i)*delta;
-                id_to_S = find(S_matrix == i);
-                current_delta_h = S_matrix(id_to_S,4) + new_delta;
-                current_delta_v = S_matrix(id_to_S,3) + new_delta;
+                if i == 1
+                    id_to_S = find(S_matrix == i);
+                    current_delta_h = S_matrix(id_to_S,4) + new_delta;
+                    current_delta_v = S_matrix(id_to_S,3) + new_delta;
+                else
+                    id_to_U = find(U_matrix == i);
+                    current_delta_h = U_matrix(id_to_U,4) + new_delta;
+                    current_delta_v = U_matrix(id_to_U,3) + new_delta;
+                end
                 if (current_delta_h < alpha_2) && (current_delta_v < alpha_1) && point_v_flag(j) == 1 && j ~= length(data_set)
                     current_delta_v = 0;
                 elseif (current_delta_h < beta_2) && (current_delta_v < beta_1) && point_v_flag(j) == 0 && j ~= length(data_set)
@@ -72,36 +93,39 @@ function [path_result]=dij(w1)
                 end
                 id_to_U = find(U_matrix(:,1) == j);
                 if U_matrix(id_to_U,2) == Inf
+                    if i == 1
+                        U_matrix(id_to_U,2) = distance_matrix(j,i);
+                    else
                     U_matrix(id_to_U,2) = distance_matrix(j,i) + S_matrix(id_to_S,2);
                     U_matrix(id_to_U,3) = current_delta_v;
                     U_matrix(id_to_U,4) = current_delta_h;
-                    path_matrix(j)=i;
+                    path_vector(j)=i;
                 else 
                     distance_factor = U_matrix(id_to_U,2) + distance_matrix(j,i) + S_matrix(id_to_S,2);
                     delta_factor = U_matrix(id_to_U,3) + U_matrix(id_to_U,4) + current_delta_h + current_delta_v;
                     factor_old = w1 * U_matrix(id_to_U,2) / distance_factor + w2 * (U_matrix(id_to_U,3) + U_matrix(id_to_U,4)) / delta_factor;
-                    factor_new = w1 * (U_matrix(id_to_U,2) + distance_matrix(j,i)) / distance_factor + w2 * (current_delta_h + current_delta_v) / delta_factor;
+                    factor_new = w1 * (S_matrix(id_to_S,2) + distance_matrix(j,i)) / distance_factor + w2 * (current_delta_h + current_delta_v) / delta_factor;
                     if factor_new < factor_old
                         U_matrix(id_to_U,2) = distance_matrix(j,i) + S_matrix(id_to_S,2);
                         U_matrix(id_to_U,3) = current_delta_v;
                         U_matrix(id_to_U,4) = current_delta_h;
-                        path_matrix(j)=i;
+                        path_vector(j)=i;
                     end    
                 end
             end
         end
         
-        if size(to_do_list) ~= 0
-            if to_do_list(1) == 1
-                continue;
-            end
+        if i == 1
+            continue;
         end
 
-        for k = U_matrix(:,1).'
-            id_to_U = find(U_matrix == k);
-            if U_matrix(id_to_U,2) < Inf
+        for k = to_move(:,1).'
+            id_to_move = find(to_move(:,1) == k);
+            if to_move(id_to_move,2) == 1;
+                id_to_U = find(U_matrix(:,1) == k);            
                 S_matrix = [S_matrix; U_matrix(id_to_U,:)];
                 U_matrix(id_to_U,:) = [];
+                to_move(id_to_move,:) = [];
             end
         end
     end
@@ -109,7 +133,7 @@ function [path_result]=dij(w1)
     path_result=[length(data_set)];
     previous_point = length(data_set);
     while previous_point ~= 1
-        previous_point = path_matrix(previous_point);
+        previous_point = path_vector(previous_point);
         path_result = [previous_point , path_result];
     end
 
@@ -123,7 +147,7 @@ function [path_result]=dij(w1)
     for i = 1:length(path_result)
         if i == length(path_result)
             flag_correct = true;
-            fprintf('Result verification passed.\n')
+            fprintf('Result verification passed.\n');
             fprintf('Total hoping is %d.\n',length(path_result)-2);
             fprintf('Total distance is %.f.\n',total_distance);
             break;
