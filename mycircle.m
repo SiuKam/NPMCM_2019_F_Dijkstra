@@ -6,8 +6,14 @@ function [O,B_prime] = mycircle(A,B,C)
     if dot(n2,v2) < 0
         n2 = -n2;
     end
-    e3 = norm(n2);
+    e3 = n2 / norm(n2);
     v3 = 200 * e3;
     O = B + v3;
-    
+    theta_1 = asin(200 / norm(C-O));
+
+end
+
+function v_prime = vector_rotate(v,alpha)
+    T = [cos(alpha), sin(alpha); -sin(alpha), cos(alpha)];
+    v_prime = T * v';
 end
