@@ -10,6 +10,12 @@ function [O,B_prime] = mycircle(A,B,C)
     v3 = 200 * e3;
     O = B + v3;
     theta_1 = asin(200 / norm(C-O));
+    v3_1 = - vector_rotate((C-O), theta_1) / norm(C-O) * sqrt((norm(C-O))^2 + 200^2);
+    v3_2 = - vector_rotate((C-O), theta_1) / norm(C-O) * sqrt((norm(C-O))^2 + 200^2);
+    B_prime_1 = C - v3_1;
+    B_prime_1 = C - v3_2;
+
+    plot3(A,B,C);
 
 end
 
