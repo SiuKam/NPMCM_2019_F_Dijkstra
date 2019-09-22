@@ -1,3 +1,14 @@
+j=1;
+for i = path_result
+    x_result(j) = data_set(i,2);
+    y_result(j) = data_set(i,3);
+    z_result(j) = data_set(i,4);
+    j = j + 1;
+end
+plot3(v_point_x,v_point_y,v_point_z,'g.',h_point_x,h_point_y,h_point_z,'b.')
+hold on
+
+
 j = 1;
 k = 1;
 for i = path_result
@@ -33,16 +44,19 @@ for i = 1:length(data_set)
         h_point_z = [h_point_z,data_set(i,4)];
     end
 end
+plot3(x_result,y_result,z_result,'*k',cut_out_point_result(:,1),cut_out_point_result(:,2),cut_out_point_result(:,3),'*r')
 
-plot3(v_point_x,v_point_y,v_point_z,'g.',h_point_x,h_point_y,h_point_z,'b.')
-hold on
-for i = 1 : (length(path_result) * 2 - 4)
+for i = 1 : (length(path_result) * 2 - 2)
     if mod(i,2)
-        plot3([x_result(i),x_result(i+1)],[y_result(i),y_result(i+1)],[z_result(i),z_result(i+1)],'-k')        
+        plot3([x_result(i),x_result(i+1)],[y_result(i),y_result(i+1)],[z_result(i),z_result(i+1)],'-k')
+        
     else
-        plot3([x_result(i),x_result(i+1)],[y_result(i),y_result(i+1)],[z_result(i),z_result(i+1)],'-r')        
+        plot3([x_result(i),x_result(i+1)],[y_result(i),y_result(i+1)],[z_result(i),z_result(i+1)],'-r')
+        
     end
 end
+
+
 axis equal
 set(gca,'color',[245,245,245]/255)
-legend('垂直校正点','水平校正点','转弯路径-直线段','转弯路径-圆弧段')
+legend('垂直校正点','水平校正点','规划路径-校正点','规划路径-圆弧切出点','规划路径-直线段','规划路径-圆弧段')
