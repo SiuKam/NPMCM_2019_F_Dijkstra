@@ -1,4 +1,6 @@
 clear;
+% 计时
+tic;
 
 % 参数设置
 alpha_1 = 25;
@@ -25,8 +27,8 @@ end
 % 初始化各类变量
 S_matrix = [1,0,0,0];
 U_matrix = [];
-cut_out_point = [data_set(1,2),data_set(1,3),data_set(1,4)]
-circle_center_point = [0,0,0]
+cut_out_point = [data_set(1,2),data_set(1,3),data_set(1,4)];
+circle_center_point = [0,0,0];
 for i = 2:length(data_set)
     U_matrix = [U_matrix;i,Inf,Inf,Inf];
     cut_out_point = [cut_out_point;Inf,Inf,Inf];
@@ -65,6 +67,7 @@ for j = U_matrix(:,1).'
         U_matrix(id_to_U,3) = current_delta_v;
         U_matrix(id_to_U,4) = current_delta_h;
         path_matrix(j)=i;
+        cut_out_point(j,:) = [data_set(1,2),data_set(1,3),data_set(1,4)];
     end
 end
 for k = U_matrix(:,1).'
@@ -90,12 +93,12 @@ while U_matrix(end,1) == length(data_set)
     for i = to_do_list
         is_searched(i)=1;
         i_previous_point = cut_out_point(i,:);
-        i_point = (data_set(i,2),data_set(i,3),data_set(i,4));
+        i_point = [data_set(i,2),data_set(i,3),data_set(i,4)];
         v1 = i_point - i_previous_point;
         e1 = v1 / norm(v1);
         i_out_most_point = i_point + 200 * e1;
         for j = U_matrix(:,1).'            
-            j_point = (data_set(j,2),data_set(j,3),data_set(j,4));
+            j_point = [data_set(j,2),data_set(j,3),data_set(j,4)];
             judge_vector = j_point - i_out_most_point;
             if dot(e1,judge_vector) < 0
                 continue;
@@ -145,6 +148,8 @@ while previous_point ~= 1
     path_result = [previous_point , path_result];    
 end
 
+time_to_complete = toc;
+
 % 用于验证path_result的正确性
 previous_delta_v = 0;
 previous_delta_h = 0;
@@ -155,7 +160,8 @@ flag_correct = false;
 for i = 1:length(path_result)
     if i == length(path_result)
         flag_correct = true;
-        fprintf('Result verification passed.\n')
+        fprintf('Running time: %d', time_to_complete);
+        fprintf('Result verification passed.\n');
         fprintf('Total hoping is %d.\n',length(path_result)-2);
         fprintf('Total distance is %.f.\n',total_distance);
         break;
