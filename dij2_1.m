@@ -26,9 +26,11 @@ end
 S_matrix = [1,0,0,0];
 U_matrix = [];
 cut_out_point = [data_set(1,2),data_set(1,3),data_set(1,4)]
+circle_center_point = [0,0,0]
 for i = 2:length(data_set)
     U_matrix = [U_matrix;i,Inf,Inf,Inf];
     cut_out_point = [cut_out_point;Inf,Inf,Inf];
+    circle_center_point = [circle_center_point;Inf,Inf,Inf];
 end
 
 path_matrix = zeros(length(data_set),1);
@@ -75,7 +77,7 @@ end
 % 对初始点搜索完成
 
 % 对其余点
-while U_matrix(end,1)==length(data_set)
+while U_matrix(end,1) == length(data_set)
     % U_matrix = sortrows(U_matrix,2);
 
     to_do_list = [];
@@ -89,11 +91,18 @@ while U_matrix(end,1)==length(data_set)
         is_searched(i)=1;
         i_previous_point = cut_out_point(i,:);
         i_point = (data_set(i,2),data_set(i,3),data_set(i,4));
-        for j = U_matrix(:,1).'
-            
-            j_point = 
-            v1 = 
-            new_delta=distance_matrix(j,i)*delta;
+        v1 = i_point - i_previous_point;
+        e1 = v1 / norm(v1);
+        i_out_most_point = i_point + 200 * e1;
+        for j = U_matrix(:,1).'            
+            j_point = (data_set(j,2),data_set(j,3),data_set(j,4));
+            judge_vector = j_point - i_out_most_point;
+            if dot(e1,judge_vector) < 0
+                continue;
+            end
+            [arc_length,O,i_prime] = mycircle(i_previous_point,i_point,j_point);
+            new_distance = arc_length + norm(j_point - i_prime);
+            new_delta = new_distance * delta;
             id_to_S = find(S_matrix == i);
             current_delta_h = S_matrix(id_to_S,4) + new_delta;
             current_delta_v = S_matrix(id_to_S,3) + new_delta;
@@ -108,11 +117,13 @@ while U_matrix(end,1)==length(data_set)
                 continue;
             end
             id_to_U = find(U_matrix(:,1) == j);
-            if distance_matrix(j,i) + S_matrix(id_to_S,2) < U_matrix(id_to_U,2)
-                U_matrix(id_to_U,2) = distance_matrix(j,i) + S_matrix(id_to_S,2);
+            if new_distance + S_matrix(id_to_S,2) < U_matrix(id_to_U,2)
+                U_matrix(id_to_U,2) = new_distance + S_matrix(id_to_S,2);
                 U_matrix(id_to_U,3) = current_delta_v;
                 U_matrix(id_to_U,4) = current_delta_h;
-                path_matrix(j)=i;
+                path_matrix(j) = i;
+                cut_out_point(j,:) = i_prime;
+                circle_center_point(j,:) = O;
             end
         end
     end
@@ -127,9 +138,11 @@ end
 
 path_result=[length(data_set)];
 previous_point = length(data_set);
+cut_out_point_result = [];
 while previous_point ~= 1
+    cut_out_point_result = [cut_out_point(previous_point,:);cut_out_point_result];
     previous_point = path_matrix(previous_point);
-    path_result = [previous_point , path_result];
+    path_result = [previous_point , path_result];    
 end
 
 % 用于验证path_result的正确性
@@ -147,6 +160,8 @@ for i = 1:length(path_result)
         fprintf('Total distance is %.f.\n',total_distance);
         break;
     end
+    O_point = cir
+    turn_theta
     new_delta=distance_matrix(path_result(i),path_result(i+1))*delta;
     current_delta_h = previous_delta_h + new_delta;
     current_delta_v = previous_delta_v + new_delta;
@@ -165,13 +180,13 @@ for i = 1:length(path_result)
 end
 
 
-j=1;
-for i = path_result
-    x_result(j) = data_set(i,2);
-    y_result(j) = data_set(i,3);
-    z_result(j) = data_set(i,4);
-    j = j + 1;
-end
+% j=1;
+% for i = path_result
+%     x_result(j) = data_set(i,2);
+%     y_result(j) = data_set(i,3);
+%     z_result(j) = data_set(i,4);
+%     j = j + 1;
+% end
 
 v_point_x = [];
 v_point_y = [];
@@ -191,6 +206,6 @@ for i = 1:length(data_set)
     end
 end
 
-plot3(x_result,y_result,z_result,'*-r',v_point_x,v_point_y,v_point_z,'g.',h_point_x,h_point_y,h_point_z,'b.')
+plot3(path_result,'*-r',v_point_x,v_point_y,v_point_z,'g.',h_point_x,h_point_y,h_point_z,'b.')
 hold on
 axis equal

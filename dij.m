@@ -1,6 +1,6 @@
 clear;
 
-% å‚æ•°è®¾ç½®
+% ²ÎÊıÉèÖÃ
 alpha_1 = 25;
 alpha_2 = 15;
 beta_1 = 20;
@@ -9,7 +9,7 @@ theta = 30;
 delta = 1e-3;
 data_file = 'data_set_1.xlsx';
 
-% æ•°æ®è¯»å–
+% Êı¾İ¶ÁÈ¡
 data_set=xlsread(data_file);
 point_v_flag = data_set(:,5);
 distance_matrix=zeros(length(data_set),length(data_set));
@@ -21,7 +21,7 @@ for i = 1 : length(data_set)
     end
 end
 
-% åˆå§‹åŒ–å„ç±»å˜é‡
+% ³õÊ¼»¯¸÷Àà±äÁ¿
 S_matrix = [1,0,0,0];
 U_matrix = [];
 for i = 2:length(data_set)
@@ -88,7 +88,7 @@ while previous_point ~= 1
     path_result = [previous_point , path_result];
 end
 
-% ç”¨äºéªŒè¯path_resultçš„æ­£ç¡®æ€§
+% ÓÃÓÚÑéÖ¤path_resultµÄÕıÈ·ĞÔ
 previous_delta_v = 0;
 previous_delta_h = 0;
 current_delta_h = 0;
@@ -147,6 +147,8 @@ for i = 1:length(data_set)
     end
 end
 
-plot3(x_result,y_result,z_result,'*-r',v_point_x,v_point_y,v_point_z,'g.',h_point_x,h_point_y,h_point_z,'b.')
+plot3(x_result,y_result,z_result,'*-k',v_point_x,v_point_y,v_point_z,'g.',h_point_x,h_point_y,h_point_z,'b.')
 hold on
 axis equal
+set(gca,'color',[245,245,245]/255)
+legend('¹æ»®ÏßÂ·','´¹Ö±Ğ£Õıµã','Ë®Æ½Ğ£Õıµã')
