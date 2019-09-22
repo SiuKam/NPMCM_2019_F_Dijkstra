@@ -18,7 +18,6 @@ function [O,B_prime] = mycircle(a,b,c)
     v3 = 200 * e3;
     O = B + v3;
     theta_1 = asin(200 / norm(C-O));
-    B_prime = fsolve('fun',B,optimset('Display','off'));
-    
+    B_prime = fsolve('fun',B,optimset('Display','off'));   
     
 end

@@ -1,6 +1,6 @@
 clear;
 
-% å‚æ•°è®¾ç½®
+% ²ÎÊıÉèÖÃ
 alpha_1 = 25;
 alpha_2 = 15;
 beta_1 = 20;
@@ -10,7 +10,7 @@ delta = 1e-3;
 minimum_radius = 200;
 data_file = 'data_set_1.xlsx';
 
-% æ•°æ®è¯»å–
+% Êı¾İ¶ÁÈ¡
 data_set=xlsread(data_file);
 point_v_flag = data_set(:,5);
 distance_matrix=zeros(length(data_set),length(data_set));
@@ -22,7 +22,7 @@ for i = 1 : length(data_set)
     end
 end
 
-% åˆå§‹åŒ–å„ç±»å˜é‡
+% ³õÊ¼»¯¸÷Àà±äÁ¿
 S_matrix = [1,0,0,0];
 U_matrix = [];
 cut_out_point = [data_set(1,2),data_set(1,3),data_set(1,4)]
@@ -41,7 +41,7 @@ previous_delta_h = 0;
 current_delta_h = 0;
 current_delta_v = 0;
 
-% å¯¹èµ·å§‹ç‚¹
+% ¶ÔÆğÊ¼µã
 i = 1;
 is_searched(i)=1;
 for j = U_matrix(:,1).'
@@ -74,9 +74,9 @@ for k = U_matrix(:,1).'
         U_matrix(id_to_U,:) = [];
     end
 end
-% å¯¹åˆå§‹ç‚¹æœç´¢å®Œæˆ
+% ¶Ô³õÊ¼µãËÑË÷Íê³É
 
-% å¯¹å…¶ä½™ç‚¹
+% ¶ÔÆäÓàµã
 while U_matrix(end,1) == length(data_set)
     % U_matrix = sortrows(U_matrix,2);
 
@@ -145,7 +145,7 @@ while previous_point ~= 1
     path_result = [previous_point , path_result];    
 end
 
-% ç”¨äºéªŒè¯path_resultçš„æ­£ç¡®æ€§
+% ÓÃÓÚÑéÖ¤path_resultµÄÕıÈ·ĞÔ
 previous_delta_v = 0;
 previous_delta_h = 0;
 current_delta_h = 0;
