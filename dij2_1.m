@@ -142,10 +142,12 @@ end
 path_result=[length(data_set)];
 previous_point = length(data_set);
 cut_out_point_result = [];
+circle_center_result = [];
 while previous_point ~= 1
     cut_out_point_result = [cut_out_point(previous_point,:);cut_out_point_result];
+    circle_center_result = [circle_center_point(previous_point,:);circle_center_result];
     previous_point = path_matrix(previous_point);
-    path_result = [previous_point , path_result];    
+    path_result = [previous_point , path_result];
 end
 
 time_to_complete = toc;
@@ -157,7 +159,26 @@ current_delta_h = 0;
 current_delta_v = 0;
 total_distance = 0;
 flag_correct = false;
-for i = 1:length(path_result)
+
+i = 1;
+total_distance = distance_matrix(path_result(i),path_result(i+1));
+new_delta=distance_matrix(path_result(i),path_result(i+1))*delta;
+current_delta_h = previous_delta_h + new_delta;
+current_delta_v = previous_delta_v + new_delta;
+total_distance = total_distance + distance_matrix(path_result(i),path_result(i+1));
+if (current_delta_h < alpha_2) && (current_delta_v < alpha_1) && point_v_flag(path_result(i+1)) == 1 && path_result(i+1) ~= length(data_set)
+    current_delta_v = 0;
+elseif (current_delta_h < beta_2) && (current_delta_v < beta_1) && point_v_flag(path_result(i+1)) == 0 && path_result(i+1) ~= length(data_set)
+    current_delta_h = 0;
+elseif path_result(i+1) == length(data_set) && (current_delta_h < theta) && (current_delta_v < theta)
+    current_delta_h = 0;
+    current_delta_v = 0;
+else
+    fprintf('Result verification NOT passed.\n');   
+    exit;
+end
+
+for i = 2:length(path_result)
     if i == length(path_result)
         flag_correct = true;
         fprintf('Running time: %d', time_to_complete);
@@ -166,12 +187,15 @@ for i = 1:length(path_result)
         fprintf('Total distance is %.f.\n',total_distance);
         break;
     end
-    O_point = cir
-    turn_theta
-    new_delta=distance_matrix(path_result(i),path_result(i+1))*delta;
+    O_point = circle_center_point(path_result(i+1));
+    i_point = [data_set(path_result(i),2),data_set(path_result(i),3),data_set(path_result(i),4)];
+    j_point = [data_set(path_result(i+1),2),data_set(path_result(i+1),3),data_set(path_result(i+1),4)];
+    turn_theta = acos(dot((O_point - [data_set(path_result(i),2:4)]),(O_point - cut_out_point_result(i,:))) / norm(O_point - [data_set(path_result(i),2:4)]) / norm(O_point - cut_out_point_result(i,:)));
+    arc_length = turn_theta * minimum_radius;
+    new_delta = (arc_length + norm([data_set(path_result(i+1),2:4)]-cut_out_point_result(i,:)))*delta;
     current_delta_h = previous_delta_h + new_delta;
     current_delta_v = previous_delta_v + new_delta;
-    total_distance = total_distance + distance_matrix(path_result(i),path_result(i+1));
+    total_distance = total_distance + new_delta / delta;
     if (current_delta_h < alpha_2) && (current_delta_v < alpha_1) && point_v_flag(path_result(i+1)) == 1 && path_result(i+1) ~= length(data_set)
         current_delta_v = 0;
     elseif (current_delta_h < beta_2) && (current_delta_v < beta_1) && point_v_flag(path_result(i+1)) == 0 && path_result(i+1) ~= length(data_set)
@@ -181,18 +205,27 @@ for i = 1:length(path_result)
         current_delta_v = 0;
     else
         fprintf('Result verification NOT passed.\n');   
-        break;
+        exit;
     end
 end
 
+% »æÍ¼
 
-% j=1;
-% for i = path_result
-%     x_result(j) = data_set(i,2);
-%     y_result(j) = data_set(i,3);
-%     z_result(j) = data_set(i,4);
-%     j = j + 1;
-% end
+j = 1;
+k = 1;
+for i = path_result
+    x_result(j) = data_set(i,2);
+    y_result(j) = data_set(i,3);
+    z_result(j) = data_set(i,4);
+    if k == length(path_result)
+        break;
+    end
+    x_result(j + 1) = cut_out_point_result(k,1);
+    y_result(j + 1) = cut_out_point_result(k,2);
+    z_result(j + 1) = cut_out_point_result(k,3);
+    j = j + 2;
+    k = k + 1;
+end
 
 v_point_x = [];
 v_point_y = [];
@@ -212,6 +245,13 @@ for i = 1:length(data_set)
     end
 end
 
-plot3(path_result,'*-r',v_point_x,v_point_y,v_point_z,'g.',h_point_x,h_point_y,h_point_z,'b.')
+plot3(v_point_x,v_point_y,v_point_z,'g.',h_point_x,h_point_y,h_point_z,'b.')
 hold on
+for i = 1 : (length(path_result) * 2 - 4)
+    if mod(i,2)
+        plot3([x_result(i),x_result(i+1)],[y_result(i),y_result(i+1)],[z_result(i),z_result(i+1)],'*-r')
+    else
+        plot3([x_result(i),x_result(i+1)],[y_result(i),y_result(i+1)],[z_result(i),z_result(i+1)],'*-k')
+    end
+end
 axis equal
