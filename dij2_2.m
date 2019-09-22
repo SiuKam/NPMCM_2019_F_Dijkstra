@@ -181,7 +181,7 @@ end
 for i = 2:length(path_result)
     if i == length(path_result)
         flag_correct = true;
-        fprintf('Running time: %d', time_to_complete);
+        fprintf('Running time: %d.\n', time_to_complete);
         fprintf('Result verification passed.\n');
         fprintf('Total hoping is %d.\n',length(path_result)-2);
         fprintf('Total distance is %.f.\n',total_distance);
@@ -251,7 +251,7 @@ for i = 1 : (length(path_result) * 2 - 4)
     if mod(i,2)
         plot3([x_result(i),x_result(i+1)],[y_result(i),y_result(i+1)],[z_result(i),z_result(i+1)],'*-r')
     else
-        plot3([x_result(i),x_result(i+1)],[y_result(i),y_result(i+1)],[z_result(i),z_result(i+1)],'*-k')
+        plot3([x_result(i),x_result(i+1)],[y_result(i),y_result(i+1)],[z_result(i),z_result(i+1)],'-k')
     end
 end
 axis equal

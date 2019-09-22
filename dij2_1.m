@@ -67,7 +67,7 @@ for j = U_matrix(:,1).'
         U_matrix(id_to_U,3) = current_delta_v;
         U_matrix(id_to_U,4) = current_delta_h;
         path_matrix(j)=i;
-        cut_out_point(j,:) = [data_set(1,2),data_set(1,3),data_set(1,4)];
+        cut_out_point(j,:) = [data_set(1,2:4)];
     end
 end
 for k = U_matrix(:,1).'
@@ -93,12 +93,12 @@ while U_matrix(end,1) == length(data_set)
     for i = to_do_list
         is_searched(i)=1;
         i_previous_point = cut_out_point(i,:);
-        i_point = [data_set(i,2),data_set(i,3),data_set(i,4)];
+        i_point = [data_set(i,2:4)];
         v1 = i_point - i_previous_point;
         e1 = v1 / norm(v1);
         i_out_most_point = i_point + 200 * e1;
         for j = U_matrix(:,1).'            
-            j_point = [data_set(j,2),data_set(j,3),data_set(j,4)];
+            j_point = [data_set(j,2:4)];
             judge_vector = j_point - i_out_most_point;
             if dot(e1,judge_vector) < 0
                 continue;
@@ -149,6 +149,8 @@ while previous_point ~= 1
     previous_point = path_matrix(previous_point);
     path_result = [previous_point , path_result];
 end
+cut_out_point_result(1,:) = [];
+circle_center_result(1,:) = [];
 
 time_to_complete = toc;
 
@@ -162,10 +164,9 @@ flag_correct = false;
 
 i = 1;
 total_distance = distance_matrix(path_result(i),path_result(i+1));
-new_delta=distance_matrix(path_result(i),path_result(i+1))*delta;
+new_delta = distance_matrix(path_result(i),path_result(i+1))*delta;
 current_delta_h = previous_delta_h + new_delta;
 current_delta_v = previous_delta_v + new_delta;
-total_distance = total_distance + distance_matrix(path_result(i),path_result(i+1));
 if (current_delta_h < alpha_2) && (current_delta_v < alpha_1) && point_v_flag(path_result(i+1)) == 1 && path_result(i+1) ~= length(data_set)
     current_delta_v = 0;
 elseif (current_delta_h < beta_2) && (current_delta_v < beta_1) && point_v_flag(path_result(i+1)) == 0 && path_result(i+1) ~= length(data_set)
@@ -174,28 +175,31 @@ elseif path_result(i+1) == length(data_set) && (current_delta_h < theta) && (cur
     current_delta_h = 0;
     current_delta_v = 0;
 else
-    fprintf('Result verification NOT passed.\n');   
-    exit;
+    fprintf('Result verification NOT passed.\n');
 end
 
 for i = 2:length(path_result)
     if i == length(path_result)
         flag_correct = true;
-        fprintf('Running time: %d', time_to_complete);
+        fprintf('Running time: %d.\n', time_to_complete);
         fprintf('Result verification passed.\n');
         fprintf('Total hoping is %d.\n',length(path_result)-2);
         fprintf('Total distance is %.f.\n',total_distance);
         break;
     end
-    O_point = circle_center_point(path_result(i+1));
-    i_point = [data_set(path_result(i),2),data_set(path_result(i),3),data_set(path_result(i),4)];
-    j_point = [data_set(path_result(i+1),2),data_set(path_result(i+1),3),data_set(path_result(i+1),4)];
-    turn_theta = acos(dot((O_point - [data_set(path_result(i),2:4)]),(O_point - cut_out_point_result(i,:))) / norm(O_point - [data_set(path_result(i),2:4)]) / norm(O_point - cut_out_point_result(i,:)));
-    arc_length = turn_theta * minimum_radius;
-    new_delta = (arc_length + norm([data_set(path_result(i+1),2:4)]-cut_out_point_result(i,:)))*delta;
+    O_point = circle_center_result(i-1);
+    i_point = [data_set(path_result(i),2:4)];
+    i_p_point = [cut_out_point_result(i-1,:)];
+    j_point = [data_set(path_result(i+1),2:4)];
+    v1 = O_point - i_point;
+    v2 = O_point - i_p_point;
+    turn_theta = acos(dot(v1,v2) / norm(v1) / norm(v2));
+    arc_length = turn_theta * 200;
+    v3 = j_point - i_p_point;
+    new_delta = (arc_length + norm(v3))*delta;
     current_delta_h = previous_delta_h + new_delta;
     current_delta_v = previous_delta_v + new_delta;
-    total_distance = total_distance + new_delta / delta;
+    total_distance = total_distance + arc_length + norm(v3);
     if (current_delta_h < alpha_2) && (current_delta_v < alpha_1) && point_v_flag(path_result(i+1)) == 1 && path_result(i+1) ~= length(data_set)
         current_delta_v = 0;
     elseif (current_delta_h < beta_2) && (current_delta_v < beta_1) && point_v_flag(path_result(i+1)) == 0 && path_result(i+1) ~= length(data_set)
@@ -205,7 +209,7 @@ for i = 2:length(path_result)
         current_delta_v = 0;
     else
         fprintf('Result verification NOT passed.\n');   
-        exit;
+        break;
     end
 end
 
@@ -251,7 +255,7 @@ for i = 1 : (length(path_result) * 2 - 4)
     if mod(i,2)
         plot3([x_result(i),x_result(i+1)],[y_result(i),y_result(i+1)],[z_result(i),z_result(i+1)],'*-r')
     else
-        plot3([x_result(i),x_result(i+1)],[y_result(i),y_result(i+1)],[z_result(i),z_result(i+1)],'*-k')
+        plot3([x_result(i),x_result(i+1)],[y_result(i),y_result(i+1)],[z_result(i),z_result(i+1)],'-k')
     end
 end
 axis equal

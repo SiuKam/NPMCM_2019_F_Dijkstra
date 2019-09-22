@@ -4,12 +4,12 @@ for i = path_result
     x_result(j) = data_set(i,2);
     y_result(j) = data_set(i,3);
     z_result(j) = data_set(i,4);
-    if k == length(path_result)
-        break;
+    if k == length(path_result) || k == 1 || k ==2
+        continue;
     end
-    x_result(j + 1) = cut_out_point_result(k,1);
-    y_result(j + 1) = cut_out_point_result(k,2);
-    z_result(j + 1) = cut_out_point_result(k,3);
+    x_result(j + 1) = cut_out_point_result(k-2,1);
+    y_result(j + 1) = cut_out_point_result(k-2,2);
+    z_result(j + 1) = cut_out_point_result(k-2,3);
     j = j + 2;
     k = k + 1;
 end
