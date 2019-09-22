@@ -2,7 +2,7 @@ clear;
 clc;
 
 s = 0;
-gap = 0.05;
+gap = 0.1;
 eend = 1
 
 path_cell = cell(1,(eend-s)/gap);
