@@ -5,9 +5,11 @@ current_delta_h = 0;
 current_delta_v = 0;
 total_distance = 0;
 flag_correct = false;
+total_distance_matrix = [];
 
 i = 1;
 total_distance = distance_matrix(path_result(i),path_result(i+1));
+total_distance_matrix = [total_distance_matrix; total_distance];
 new_delta = distance_matrix(path_result(i),path_result(i+1))*delta;
 current_delta_h = previous_delta_h + new_delta;
 current_delta_v = previous_delta_v + new_delta;
@@ -44,6 +46,7 @@ for i = 2:length(path_result)
     current_delta_h = previous_delta_h + new_delta;
     current_delta_v = previous_delta_v + new_delta;
     total_distance = total_distance + arc_length + norm(v3);
+    total_distance_matrix = [total_distance_matrix; total_distance];
     if (current_delta_h < alpha_2) && (current_delta_v < alpha_1) && point_v_flag(path_result(i+1)) == 1 && path_result(i+1) ~= length(data_set)
         current_delta_v = 0;
     elseif (current_delta_h < beta_2) && (current_delta_v < beta_1) && point_v_flag(path_result(i+1)) == 0 && path_result(i+1) ~= length(data_set)
