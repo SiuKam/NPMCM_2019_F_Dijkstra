@@ -12,7 +12,7 @@ rate_m = [];
 
 k = 1;
 for i = s:gap:eend
-    [new_path,jump_m(k),length_m(k),rate_m(k)] = dij3(i);
+    [new_path,jump_m(k),length_m(k),rate_m(k)] = dij3_2(i);
     path_cell{k} = new_path;
     k = k + 1;
 end

@@ -5,13 +5,13 @@ function [path_result,total_jump,total_l,suc_rate] = dij3(p_index)
 %
 % Long description
     % 参数设置
-    alpha_1 = 25 - 5 * p_index;
-    alpha_2 = 15 - 5 * p_index;
-    beta_1 = 20 - 5 * p_index;
-    beta_2 = 25 - 5 * p_index;
-    theta = 30;
+    alpha_1 = 20 - 5 * p_index;
+    alpha_2 = 10 - 5 * p_index;
+    beta_1 = 15 - 5 * p_index;
+    beta_2 = 20 - 5 * p_index;
+    theta = 20 - 5 * p_index;
     delta = 1e-3;
-    data_file = 'data_set_1.xlsx';
+    data_file = 'data_set_2.xlsx';
 
     % 数据读取
     data_set=xlsread(data_file);
