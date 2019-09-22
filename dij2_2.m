@@ -3,14 +3,14 @@ clear;
 tic;
 
 % 参数设置
-alpha_1 = 25;
-alpha_2 = 15;
-beta_1 = 20;
-beta_2 = 25;
-theta = 30;
+alpha_1 = 20;
+alpha_2 = 10;
+beta_1 = 15;
+beta_2 = 20;
+theta = 20;
 delta = 1e-3;
 minimum_radius = 200;
-data_file = 'data_set_1.xlsx';
+data_file = 'data_set_2.xlsx';
 
 % 数据读取
 data_set=xlsread(data_file);
@@ -153,40 +153,63 @@ end
 time_to_complete = toc;
 
 % 用于验证path_result的正确性
-% previous_delta_v = 0;
-% previous_delta_h = 0;
-% current_delta_h = 0;
-% current_delta_v = 0;
-% total_distance = 0;
-% flag_correct = false;
-% for i = 1:length(path_result)
-%     if i == length(path_result)
-%         flag_correct = true;
-%         fprintf('Running time: %d', time_to_complete);
-%         fprintf('Result verification passed.\n');
-%         fprintf('Total hoping is %d.\n',length(path_result)-2);
-%         fprintf('Total distance is %.f.\n',total_distance);
-%         break;
-%     end
-%     O_point = circle_center_point()
-%     turn_theta
-%     new_delta=distance_matrix(path_result(i),path_result(i+1))*delta;
-%     current_delta_h = previous_delta_h + new_delta;
-%     current_delta_v = previous_delta_v + new_delta;
-%     total_distance = total_distance + distance_matrix(path_result(i),path_result(i+1));
-%     if (current_delta_h < alpha_2) && (current_delta_v < alpha_1) && point_v_flag(path_result(i+1)) == 1 && path_result(i+1) ~= length(data_set)
-%         current_delta_v = 0;
-%     elseif (current_delta_h < beta_2) && (current_delta_v < beta_1) && point_v_flag(path_result(i+1)) == 0 && path_result(i+1) ~= length(data_set)
-%         current_delta_h = 0;
-%     elseif path_result(i+1) == length(data_set) && (current_delta_h < theta) && (current_delta_v < theta)
-%         current_delta_h = 0;
-%         current_delta_v = 0;
-%     else
-%         fprintf('Result verification NOT passed.\n');   
-%         break;
-%     end
-% end
+previous_delta_v = 0;
+previous_delta_h = 0;
+current_delta_h = 0;
+current_delta_v = 0;
+total_distance = 0;
+flag_correct = false;
 
+i = 1;
+total_distance = distance_matrix(path_result(i),path_result(i+1));
+new_delta=distance_matrix(path_result(i),path_result(i+1))*delta;
+current_delta_h = previous_delta_h + new_delta;
+current_delta_v = previous_delta_v + new_delta;
+total_distance = total_distance + distance_matrix(path_result(i),path_result(i+1));
+if (current_delta_h < alpha_2) && (current_delta_v < alpha_1) && point_v_flag(path_result(i+1)) == 1 && path_result(i+1) ~= length(data_set)
+    current_delta_v = 0;
+elseif (current_delta_h < beta_2) && (current_delta_v < beta_1) && point_v_flag(path_result(i+1)) == 0 && path_result(i+1) ~= length(data_set)
+    current_delta_h = 0;
+elseif path_result(i+1) == length(data_set) && (current_delta_h < theta) && (current_delta_v < theta)
+    current_delta_h = 0;
+    current_delta_v = 0;
+else
+    fprintf('Result verification NOT passed.\n');   
+    exit;
+end
+
+for i = 2:length(path_result)
+    if i == length(path_result)
+        flag_correct = true;
+        fprintf('Running time: %d', time_to_complete);
+        fprintf('Result verification passed.\n');
+        fprintf('Total hoping is %d.\n',length(path_result)-2);
+        fprintf('Total distance is %.f.\n',total_distance);
+        break;
+    end
+    O_point = circle_center_point(path_result(i+1));
+    i_point = [data_set(path_result(i),2),data_set(path_result(i),3),data_set(path_result(i),4)];
+    j_point = [data_set(path_result(i+1),2),data_set(path_result(i+1),3),data_set(path_result(i+1),4)];
+    turn_theta = acos(dot((O_point - [data_set(path_result(i),2:4)]),(O_point - cut_out_point_result(i,:))) / norm(O_point - [data_set(path_result(i),2:4)]) / norm(O_point - cut_out_point_result(i,:)));
+    arc_length = turn_theta * minimum_radius;
+    new_delta = (arc_length + norm([data_set(path_result(i+1),2:4)]-cut_out_point_result(i,:)))*delta;
+    current_delta_h = previous_delta_h + new_delta;
+    current_delta_v = previous_delta_v + new_delta;
+    total_distance = total_distance + new_delta / delta;
+    if (current_delta_h < alpha_2) && (current_delta_v < alpha_1) && point_v_flag(path_result(i+1)) == 1 && path_result(i+1) ~= length(data_set)
+        current_delta_v = 0;
+    elseif (current_delta_h < beta_2) && (current_delta_v < beta_1) && point_v_flag(path_result(i+1)) == 0 && path_result(i+1) ~= length(data_set)
+        current_delta_h = 0;
+    elseif path_result(i+1) == length(data_set) && (current_delta_h < theta) && (current_delta_v < theta)
+        current_delta_h = 0;
+        current_delta_v = 0;
+    else
+        fprintf('Result verification NOT passed.\n');   
+        exit;
+    end
+end
+
+% 绘图
 
 j = 1;
 k = 1;
@@ -194,7 +217,7 @@ for i = path_result
     x_result(j) = data_set(i,2);
     y_result(j) = data_set(i,3);
     z_result(j) = data_set(i,4);
-    if j == length(path_result)
+    if k == length(path_result)
         break;
     end
     x_result(j + 1) = cut_out_point_result(k,1);
