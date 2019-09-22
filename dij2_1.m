@@ -187,10 +187,10 @@ for i = 2:length(path_result)
         fprintf('Total distance is %.f.\n',total_distance);
         break;
     end
-    O_point = circle_center_result(i-1);
-    i_point = [data_set(path_result(i),2:4)];
-    i_p_point = [cut_out_point_result(i-1,:)];
-    j_point = [data_set(path_result(i+1),2:4)];
+    O_point = circle_center_result(i-1,:);
+    i_point = data_set(path_result(i),2:4);
+    i_p_point = cut_out_point_result(i-1,:);
+    j_point = data_set(path_result(i+1),2:4);
     v1 = O_point - i_point;
     v2 = O_point - i_p_point;
     turn_theta = acos(dot(v1,v2) / norm(v1) / norm(v2));
