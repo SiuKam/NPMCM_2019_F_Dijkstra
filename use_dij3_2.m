@@ -3,9 +3,9 @@ clc;
 
 s = 0;
 gap = 0.05;
-eend = 1
+eend = 0.7;
 
-path_cell = cell(1,(eend-s)/gap);
+path_cell = cell(1,14);
 jump_m = [];
 length_m = [];
 rate_m = [];
